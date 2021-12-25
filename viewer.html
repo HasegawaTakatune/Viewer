@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>File Viewer</title>
+    <script src="https://www.promisejs.org/polyfills/promise-7.0.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div>
+            <p>間隔</p>
+            <input type="radio" name="interval" id="interval-1" value=1 @click="ResetInterval(1)" checked />
+            <label for="interval-1">1秒</label>
+            <input type="radio" name="interval" id="interval-10" value=10 @click="ResetInterval(10)" />
+            <label for="interval-10">10秒</label>
+            <input type="radio" name="interval" id="interval-30" value=30 @click="ResetInterval(30)" />
+            <label for="interval-30">30秒</label>
+            <div>{{interval}}</div>
+            <div>{{count}}</div>
+            <div>{{timer.toFixed(1)}}</div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th v-for="(row, key) in response" :key="key">{{key}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td v-for="(row, key) in response" :key="key">{{row}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            name: 'FileViewer',
+            data: {
+                timer: 0,
+                maxTime: 1,
+
+                headers: ['ID', '場所', '備考'],
+                count: 0,
+                interval: 1,
+                url: 'https://www.jma.go.jp/bosai/forecast/data/overview_forecast/130000.json',
+                response: null,
+
+                methodId: null,
+            },
+
+            methods: {
+                GetFile() {
+                    let self = this;
+                    axios.get(self.url)
+                        .then(
+                            res => {
+                                self.response = res.data;
+                                self.count++;
+                            }
+                        )
+                        .catch(e => {
+                            console.error(e);
+                        })
+
+                    this.methodId = setTimeout(this.GetFile, this.interval * 1000)
+                },
+
+                ResetInterval(interval) {
+                    this.interval = interval;
+
+                    this.maxTime = interval;
+                    this.timer = 0;
+
+                    clearTimeout(this.methodId);
+                    this.GetFile();
+                },
+
+                TimeCount() {
+                    this.timer += 0.1;
+                    if (this.maxTime <= this.timer) this.timer = 0;
+                }
+            },
+
+            mounted() {
+                this.GetFile();
+                setInterval(this.TimeCount, 100);
+            },
+
+            beforeDestroy() {
+                clearTimeout(this.GetFile);
+                clearInterval(this.TimeCount);
+            },
+        });
+    </script>
+    <style>
+        table * {
+            border: 1px double black;
+        }
+    </style>
+</body>
+
+</html>
