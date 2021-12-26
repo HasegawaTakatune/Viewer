@@ -61,8 +61,12 @@
                     axios.get(self.url)
                         .then(
                             res => {
+                                const list = res.data.split(/\n/);
+                                const dd = list[0].split(' ');
+                                // console.log(list);
+                                // console.log(res);
                                 // console.log(res.data);
-                                const dd = res.data.split(' ');
+                                // const dd = res.data.split(' ');
                                 // console.log(dd.slice(0, 2));
                                 // console.log(this.ConvertAscii2String(dd, 0, 2));
 
