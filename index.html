@@ -40,10 +40,10 @@
             el: '#app',
             name: 'Viewer',
             data: {
-                no : 1,
+                no: 1,
                 headers: ['No.', '年月日', '時刻', 'データ'],
                 interval: 1,
-                url: '',
+                url: 'https://hasegawatakatune.github.io/Viewer/data.txt',
                 response: null,
 
                 methodId: null,
@@ -55,21 +55,40 @@
                     self.no++;
                     self.no = (self.no <= 99) ? self.no++ : 1;
 
-                    self.response = [
-                        { no: self.no, day: 'XX/XX/XX', time: 'XX:XX:XX', data: '123' },
-                    ];
-                    // axios.get(self.url)
-                    //     .then(
-                    //         res => {
-                    //             self.response = [
-                    //                 { no: '0001', day: now.format('YYYY/MM/DD'), time: now.format('hh:mm:ss'), data: 'SAMPLE' },
-                    //                 { no: '0002', day: now.format('YYYY/MM/DD'), time: now.format('hh:mm:ss'), data: 'SAMPLE' }
-                    //             ] // res.data;
-                    //         }
-                    //     )
-                    //     .catch(e => {
-                    //         console.error(e);
-                    //     })
+                    // self.response = [
+                    //     { no: self.no, day: 'XX/XX/XX', time: 'XX:XX:XX', data: '123' },
+                    // ];
+                    axios.get(self.url)
+                        .then(
+                            res => {
+                                // console.log(res.data);
+                                const dd = res.data.split(' ');
+                                // console.log(dd.slice(0, 2));
+                                // console.log(this.ConvertAscii2String(dd, 0, 2));
+
+                                // let no = this.ConvertAscii2String(dd, 0, 2);
+                                // let day = this.ConvertAscii2String(dd, 2, 8);
+                                // let time = this.ConvertAscii2String(dd, 8, 14);
+                                // let data = this.ConvertAscii2String(dd, 14);
+                                // console.log(`No.:${no}  Day:${day}  Time:${time}  Data:${data}`);
+
+                                self.response = [
+                                    {
+                                        no: self.ConvertAscii2String(dd, 0, 2),
+                                        day: self.ConvertAscii2String(dd, 2, 8),
+                                        time: self.ConvertAscii2String(dd, 8, 14),
+                                        data: self.ConvertAscii2String(dd, 14)
+                                    }
+                                ];
+                                // self.response = [
+                                //     { no: '0001', day: now.format('YYYY/MM/DD'), time: now.format('hh:mm:ss'), data: 'SAMPLE' },
+                                //     { no: '0002', day: now.format('YYYY/MM/DD'), time: now.format('hh:mm:ss'), data: 'SAMPLE' }
+                                // ] // res.data;
+                            }
+                        )
+                        .catch(e => {
+                            console.error(e);
+                        })
 
                     this.methodId = setTimeout(this.GetFile, this.interval * 1000)
                 },
@@ -79,6 +98,16 @@
 
                     clearTimeout(this.methodId);
                     this.GetFile();
+                },
+
+                ConvertAscii2String(value, from = null, to = null) {
+                    const first = from ?? 0;
+                    const last = to ?? value.length;
+                    var ss = '';
+                    for (var i = first; i < last; i++) {
+                        ss += String.fromCharCode(`0x${value[i]}`);
+                    }
+                    return ss;
                 },
             },
 
