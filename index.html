@@ -13,9 +13,9 @@
     <div id="app">
         <div>
             <p>間隔</p>
-            <input type="radio" name="interval" id="interval-1" value=1 @click="ResetInterval(1)" checked />
+            <input type="radio" name="interval" id="interval-1" value=1 @click="ResetInterval(1)" />
             <label for="interval-1">1秒</label>
-            <input type="radio" name="interval" id="interval-10" value=10 @click="ResetInterval(10)" />
+            <input type="radio" name="interval" id="interval-10" value=10 @click="ResetInterval(10)" checked />
             <label for="interval-10">10秒</label>
             <input type="radio" name="interval" id="interval-30" value=30 @click="ResetInterval(30)" />
             <label for="interval-30">30秒</label>
@@ -42,7 +42,7 @@
             data: {
                 no: 1,
                 headers: ['No.', '年月日', '時刻', 'データ'],
-                interval: 1,
+                interval: 10,
                 url: 'https://hasegawatakatune.github.io/Viewer/data.txt',
                 response: null,
 
@@ -63,7 +63,7 @@
                             res => {
                                 const list = res.data.split(/\n/);
                                 const dd = list[0].split(' ');
-                                // console.log(list);
+                                console.log(list);
                                 // console.log(res);
                                 // console.log(res.data);
                                 // const dd = res.data.split(' ');
