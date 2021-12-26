@@ -19,20 +19,18 @@
             <label for="interval-10">10秒</label>
             <input type="radio" name="interval" id="interval-30" value=30 @click="ResetInterval(30)" />
             <label for="interval-30">30秒</label>
-            <div>{{interval}}</div>
-            <div>{{count}}</div>
-            <div>{{timer.toFixed(1)}}</div>
+
         </div>
 
         <table>
             <thead>
                 <tr>
-                    <th v-for="(row, key) in response" :key="key">{{key}}</th>
+                    <th v-for="(row, index) in headers" :key="index">{{row}}</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td v-for="(row, key) in response" :key="key">{{row}}</td>
+                <tr v-for="(rows, index) in response" :key="index">
+                    <td v-for="(row, key) in rows" :key="key">{{row}}</td>
                 </tr>
             </tbody>
         </table>
@@ -40,15 +38,11 @@
     <script>
         var app = new Vue({
             el: '#app',
-            name: 'FileViewer',
+            name: 'Viewer',
             data: {
-                timer: 0,
-                maxTime: 1,
-
-                headers: ['ID', '場所', '備考'],
-                count: 0,
+                headers: ['No.', '年月日', '時刻', 'データ'],
                 interval: 1,
-                url: 'https://www.jma.go.jp/bosai/forecast/data/overview_forecast/130000.json',
+                url: '',
                 response: null,
 
                 methodId: null,
@@ -57,16 +51,23 @@
             methods: {
                 GetFile() {
                     let self = this;
-                    axios.get(self.url)
-                        .then(
-                            res => {
-                                self.response = res.data;
-                                self.count++;
-                            }
-                        )
-                        .catch(e => {
-                            console.error(e);
-                        })
+                    let now = new Date();
+                    self.response = [
+                        { no: '0001', day: 'XXXX/XX/XX', time: 'XX:XX:XX', data: 'SAMPLE' },
+                        { no: '0002', day: 'XXXX/XX/XX', time: 'XX:XX:XX', data: 'SAMPLE' },
+                    ];
+                    // axios.get(self.url)
+                    //     .then(
+                    //         res => {
+                    //             self.response = [
+                    //                 { no: '0001', day: now.format('YYYY/MM/DD'), time: now.format('hh:mm:ss'), data: 'SAMPLE' },
+                    //                 { no: '0002', day: now.format('YYYY/MM/DD'), time: now.format('hh:mm:ss'), data: 'SAMPLE' }
+                    //             ] // res.data;
+                    //         }
+                    //     )
+                    //     .catch(e => {
+                    //         console.error(e);
+                    //     })
 
                     this.methodId = setTimeout(this.GetFile, this.interval * 1000)
                 },
@@ -74,27 +75,17 @@
                 ResetInterval(interval) {
                     this.interval = interval;
 
-                    this.maxTime = interval;
-                    this.timer = 0;
-
                     clearTimeout(this.methodId);
                     this.GetFile();
                 },
-
-                TimeCount() {
-                    this.timer += 0.1;
-                    if (this.maxTime <= this.timer) this.timer = 0;
-                }
             },
 
             mounted() {
                 this.GetFile();
-                setInterval(this.TimeCount, 100);
             },
 
             beforeDestroy() {
                 clearTimeout(this.GetFile);
-                clearInterval(this.TimeCount);
             },
         });
     </script>
