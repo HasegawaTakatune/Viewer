@@ -12,14 +12,16 @@
 <body>
     <div id="app">
         <div>
-            <p>間隔</p>
-            <input type="radio" name="interval" id="interval-1" value=1 @click="ResetInterval(1)" />
-            <label for="interval-1">1秒</label>
+            <span>間隔</span>
             <input type="radio" name="interval" id="interval-10" value=10 @click="ResetInterval(10)" checked />
             <label for="interval-10">10秒</label>
             <input type="radio" name="interval" id="interval-30" value=30 @click="ResetInterval(30)" />
             <label for="interval-30">30秒</label>
+        </div>
 
+        <div v-for="(rows, index) in response" :key="index">
+            {{rows.day.substr(0,2)}}/{{rows.day.substr(2,2)}}/{{rows.day.substr(4,2)}}
+            {{rows.time.substr(0,2)}}:{{rows.time.substr(2,2)}}:{{rows.time.substr(4,2)}}
         </div>
 
         <table>
@@ -30,7 +32,8 @@
             </thead>
             <tbody>
                 <tr v-for="(rows, index) in response" :key="index">
-                    <td v-for="(row, key) in rows" :key="key">{{row}}</td>
+                    <td>{{rows.no}}</td>
+                    <td>{{rows.data}}</td>
                 </tr>
             </tbody>
         </table>
@@ -41,7 +44,7 @@
             name: 'Viewer',
             data: {
                 no: 1,
-                headers: ['No.', '年月日', '時刻', 'データ'],
+                headers: ['No.', 'データ'],
                 interval: 10,
                 url: 'https://hasegawatakatune.github.io/Viewer/data.txt',
                 response: null,
@@ -55,26 +58,11 @@
                     self.no++;
                     self.no = (self.no <= 99) ? self.no++ : 1;
 
-                    // self.response = [
-                    //     { no: self.no, day: 'XX/XX/XX', time: 'XX:XX:XX', data: '123' },
-                    // ];
                     axios.get(self.url)
                         .then(
                             res => {
                                 const list = res.data.split(/\n/);
                                 const dd = list[0].split(' ');
-                                console.log(list);
-                                // console.log(res);
-                                // console.log(res.data);
-                                // const dd = res.data.split(' ');
-                                // console.log(dd.slice(0, 2));
-                                // console.log(this.ConvertAscii2String(dd, 0, 2));
-
-                                // let no = this.ConvertAscii2String(dd, 0, 2);
-                                // let day = this.ConvertAscii2String(dd, 2, 8);
-                                // let time = this.ConvertAscii2String(dd, 8, 14);
-                                // let data = this.ConvertAscii2String(dd, 14);
-                                // console.log(`No.:${no}  Day:${day}  Time:${time}  Data:${data}`);
 
                                 self.response = [
                                     {
@@ -84,10 +72,6 @@
                                         data: self.ConvertAscii2String(dd, 14)
                                     }
                                 ];
-                                // self.response = [
-                                //     { no: '0001', day: now.format('YYYY/MM/DD'), time: now.format('hh:mm:ss'), data: 'SAMPLE' },
-                                //     { no: '0002', day: now.format('YYYY/MM/DD'), time: now.format('hh:mm:ss'), data: 'SAMPLE' }
-                                // ] // res.data;
                             }
                         )
                         .catch(e => {
@@ -105,6 +89,7 @@
                 },
 
                 ConvertAscii2String(value, from = null, to = null) {
+                    if(value == null)return 'Non';
                     const first = from ?? 0;
                     const last = to ?? value.length;
                     var ss = '';
