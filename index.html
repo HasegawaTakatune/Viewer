@@ -37,6 +37,7 @@
                 </tr>
             </tbody>
         </table>
+        <!-- <div v-if="error" class="alert-text">通信エラー</div> -->
     </div>
     <script>
         var app = new Vue({
@@ -50,13 +51,16 @@
                 response: null,
 
                 methodId: null,
+                error: false,
+
+                doOnce: false,
             },
 
             methods: {
                 GetFile() {
                     let self = this;
-                    self.no++;
-                    self.no = (self.no <= 99) ? self.no++ : 1;
+                    // self.no++;
+                    self.no = ((self.no + self.interval) <= 99) ? self.no + self.interval : self.no % 10; // (self.no <= 99) ? self.no++ : 1;
 
                     axios.get(self.url)
                         .then(
@@ -69,9 +73,15 @@
                                         no: self.ConvertAscii2String(dd, 0, 2),
                                         day: self.ConvertAscii2String(dd, 2, 8),
                                         time: self.ConvertAscii2String(dd, 8, 14),
-                                        data: self.ConvertAscii2String(dd, 14)
+                                        data: self.ConvertAscii2String(dd, 14),
                                     }
                                 ];
+                                
+                                if(!self.doOnce){
+                                    self.doOnce = true;
+                                    self.no = parseInt(self.response[0].no);
+                                }
+                                self.error = (self.no != self.response[0].no);
                             }
                         )
                         .catch(e => {
@@ -89,7 +99,7 @@
                 },
 
                 ConvertAscii2String(value, from = null, to = null) {
-                    if(value == null)return 'Non';
+                    if(value == null) return 'Non';
                     const first = from ?? 0;
                     const last = to ?? value.length;
                     var ss = '';
@@ -112,6 +122,10 @@
     <style>
         table * {
             border: 1px double black;
+        }
+
+        .alert-text {
+            color: red;
         }
     </style>
 </body>
