@@ -58,6 +58,7 @@
 
             methods: {
                 GetFile() {
+                    const SOH = '1';
                     let self = this;
                     // self.no++;
                     self.no = ((self.no + self.interval) <= 99) ? self.no + self.interval : self.no % 10; // (self.no <= 99) ? self.no++ : 1;
@@ -65,17 +66,19 @@
                     axios.get(self.url)
                         .then(
                             res => {
+                                
                                 const list = res.data.split(/\n/);
-                                const dd = list[0].split(' ');
+                                const dd = list[0].split('');
 
                                 self.response = [
                                     {
-                                        no: self.ConvertAscii2String(dd, 0, 2),
-                                        day: self.ConvertAscii2String(dd, 2, 8),
-                                        time: self.ConvertAscii2String(dd, 8, 14),
-                                        data: self.ConvertAscii2String(dd, 14),
+                                        no: dd.splice(0, 4).join(''),
+                                        day: self.ConvertAscii2String(dd, 6),
+                                        time: self.ConvertAscii2String(dd, 6),
+                                        data: self.ConvertAscii2String(dd),
                                     }
                                 ];
+                                console.log(self.response);
                                 
                                 if(!self.doOnce){
                                     self.doOnce = true;
@@ -98,13 +101,15 @@
                     this.GetFile();
                 },
 
-                ConvertAscii2String(value, from = null, to = null) {
+                ConvertAscii2String(value, length = null) {
                     if(value == null) return 'Non';
-                    const first = from ?? 0;
-                    const last = to ?? value.length;
+                    if(length === null)length = value.length;
                     var ss = '';
-                    for (var i = first; i < last; i++) {
-                        ss += String.fromCharCode(`0x${value[i]}`);
+                    var code = '';
+                    for (var i = 0; i < length; i++) {
+                        code = value.splice(0, 2);
+                        if(code[0] == '0' && code[0] == '0') break;
+                        ss += String.fromCharCode(`0x${code.join('')}`);
                     }
                     return ss;
                 },
