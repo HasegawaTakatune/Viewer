@@ -38,6 +38,7 @@
             </tbody>
         </table>
         <!-- <div v-if="error" class="alert-text">通信エラー</div> -->
+        <div v-if="error" class="alert-text">異常</div>
     </div>
     <script>
         var app = new Vue({
@@ -75,7 +76,8 @@
                                         no: dd.splice(0, 4).join(''),
                                         day: self.ConvertAscii2String(dd, 6),
                                         time: self.ConvertAscii2String(dd, 6),
-                                        data: self.ConvertAscii2String(dd),
+                                        data: self.ConvertAscii2String(dd, 10),
+                                        state: dd.splice(0, 4).join(''),
                                     }
                                 ];
                                 console.log(self.response);
@@ -84,7 +86,7 @@
                                     self.doOnce = true;
                                     self.no = parseInt(self.response[0].no);
                                 }
-                                self.error = (self.no != self.response[0].no);
+                                self.error = self.response[0].state != '0000'; // (self.no != self.response[0].no);
                             }
                         )
                         .catch(e => {
@@ -104,11 +106,12 @@
                 ConvertAscii2String(value, length = null) {
                     if(value == null) return 'Non';
                     if(length === null)length = value.length;
-                    var ss = '';
-                    var code = '';
-                    for (var i = 0; i < length; i++) {
+                    let ss = code = '', i = 0;
+                    while(2 <= value.length && i < length){
+                        i++;
+
                         code = value.splice(0, 2);
-                        if(code[0] == '0' && code[0] == '0') break;
+                        if(code.join('') == '00') break;
                         ss += String.fromCharCode(`0x${code.join('')}`);
                     }
                     return ss;
