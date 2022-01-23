@@ -48,7 +48,7 @@
                 no: 1,
                 headers: ['No.', 'データ'],
                 interval: 10,
-                url: 'https://hasegawatakatune.github.io/Viewer/data.txt',
+                url: 'https://df66-240f-36-f23a-1-ec7a-50da-97c1-1c85.ngrok.io/api/get-detection', // url: 'https://hasegawatakatune.github.io/Viewer/data.txt',
                 response: null,
 
                 methodId: null,
@@ -64,11 +64,20 @@
                     // self.no++;
                     self.no = ((self.no + self.interval) <= 99) ? self.no + self.interval : self.no % 10; // (self.no <= 99) ? self.no++ : 1;
 
-                    axios.get(self.url)
+                    axios.get(self.url, { 
+                        mode: 'cors',
+                        headers: {
+                            'Content-Type': 'application/json;charset=utf-8',
+                            'Access-Control-Allow-Origin': '*'
+                        },
+                        auth: { username: "root", password: "password" },
+                    })
                         .then(
                             res => {
+                                console.log(res.data);
+                                console.log(typeof res.data[0]);
                                 
-                                const list = res.data.split(/\n/);
+                                const list = res.data[0].split(/\n/);
                                 const dd = list[0].split('');
 
                                 self.response = [
