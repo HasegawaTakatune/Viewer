@@ -48,7 +48,7 @@
                 no: 1,
                 headers: ['No.', 'データ'],
                 interval: 10,
-                url: 'https://df66-240f-36-f23a-1-ec7a-50da-97c1-1c85.ngrok.io/api/get-detection', // url: 'https://hasegawatakatune.github.io/Viewer/data.txt',
+                url: 'https://youer-data-url',
                 response: null,
 
                 methodId: null,
@@ -85,7 +85,7 @@
                                         no: dd.splice(0, 4).join(''),
                                         day: self.ConvertAscii2String(dd, 6),
                                         time: self.ConvertAscii2String(dd, 6),
-                                        data: self.ConvertAscii2String(dd, 10),
+                                        data: `${self.ConvertAscii2String(dd, 10)} ml`,
                                         state: dd.splice(0, 4).join(''),
                                     }
                                 ];
