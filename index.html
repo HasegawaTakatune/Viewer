@@ -64,20 +64,21 @@
                     // self.no++;
                     self.no = ((self.no + self.interval) <= 99) ? self.no + self.interval : self.no % 10; // (self.no <= 99) ? self.no++ : 1;
 
-                    axios.get(self.url, { 
-                        mode: 'cors',
-                        headers: {
-                            'Content-Type': 'application/json;charset=utf-8',
-                            'Access-Control-Allow-Origin': '*'
-                        },
-                        auth: { username: "root", password: "password" },
+                    axios.get(self.url, {
+                        // mode: 'cors',
+                        // headers: {
+                        //     'Content-Type': 'application/json;charset=utf-8',
+                        //     'Access-Control-Allow-Origin': '*'
+                        // },
+                        // auth: { username: "sensor-test", password: "shisaku" },
                     })
                         .then(
                             res => {
                                 console.log(res.data);
-                                console.log(typeof res.data[0]);
-                                
-                                const list = res.data[0].split(/\n/);
+                                console.log(res.data[0]);
+                                console.log(typeof res.data);
+
+                                const list = res.data.split(/\n/);
                                 const dd = list[0].split('');
 
                                 self.response = [
@@ -90,8 +91,8 @@
                                     }
                                 ];
                                 console.log(self.response);
-                                
-                                if(!self.doOnce){
+
+                                if (!self.doOnce) {
                                     self.doOnce = true;
                                     self.no = parseInt(self.response[0].no);
                                 }
@@ -113,14 +114,14 @@
                 },
 
                 ConvertAscii2String(value, length = null) {
-                    if(value == null) return 'Non';
-                    if(length === null)length = value.length;
+                    if (value == null) return 'Non';
+                    if (length === null) length = value.length;
                     let ss = code = '', i = 0;
-                    while(2 <= value.length && i < length){
+                    while (2 <= value.length && i < length) {
                         i++;
 
                         code = value.splice(0, 2);
-                        if(code.join('') == '00') break;
+                        if (code.join('') == '00') break;
                         ss += String.fromCharCode(`0x${code.join('')}`);
                     }
                     return ss;
