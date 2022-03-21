@@ -42,12 +42,12 @@
     </div>
     <script>
         var app = new Vue({
+
             el: '#app',
             name: 'Viewer',
             data: {
                 headers: ['No.', 'データ'],
                 interval: 10,
-                url: 'https://youer-data-url',
                 response: [],
 
                 methodId: null,
@@ -66,18 +66,19 @@
 
                     self.errorMessage = [];
 
-                    axios.get(self.url, {
+                    axios.get('http://k2hjnay9448g.shop/sensor_testpage/data.bin', {
                         // mode: 'cors',
                         // headers: {
                         //     'Content-Type': 'application/json;charset=utf-8',
-                        //     'Access-Control-Allow-Origin': '*'
+                        //     'Access-Control-Allow-Origin': '*',
                         // },
-                        // auth: { username: "sensor-test", password: "shisaku" },
+                        // auth: { username: 'sensor-test', password: 'shisaku' },
                     })
                         .then(
                             res => {
 
-                                const dd = '00013231303932333138303833353132330000'.split('');
+                                const list = res.data.split(/\n/);
+                                const dd = list[0].split('');
 
                                 // 取得データの変換・格納
                                 self.response = [
