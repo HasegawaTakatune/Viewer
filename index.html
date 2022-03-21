@@ -37,32 +37,34 @@
                 </tr>
             </tbody>
         </table>
-        <!-- <div v-if="error" class="alert-text">通信エラー</div> -->
-        <div v-if="error" class="alert-text">異常</div>
+
+        <div v-for="(msg, index) in errorMessage" :key="index" class="alert-text">{{msg}}</div>
     </div>
     <script>
         var app = new Vue({
             el: '#app',
             name: 'Viewer',
             data: {
-                no: 1,
                 headers: ['No.', 'データ'],
                 interval: 10,
                 url: 'https://youer-data-url',
-                response: null,
+                response: [],
 
                 methodId: null,
-                error: false,
+                errorMessage: [],
 
-                doOnce: false,
             },
 
             methods: {
+
+                // データ取得
                 GetFile() {
                     const SOH = '1';
+
                     let self = this;
-                    // self.no++;
-                    self.no = ((self.no + self.interval) <= 99) ? self.no + self.interval : self.no % 10; // (self.no <= 99) ? self.no++ : 1;
+                    let oldNo = self.response[0]?.no;
+
+                    self.errorMessage = [];
 
                     axios.get(self.url, {
                         // mode: 'cors',
@@ -74,13 +76,10 @@
                     })
                         .then(
                             res => {
-                                console.log(res.data);
-                                console.log(res.data[0]);
-                                console.log(typeof res.data);
 
-                                const list = res.data.split(/\n/);
-                                const dd = list[0].split('');
+                                const dd = '00013231303932333138303833353132330000'.split('');
 
+                                // 取得データの変換・格納
                                 self.response = [
                                     {
                                         no: dd.splice(0, 4).join(''),
@@ -90,22 +89,21 @@
                                         state: dd.splice(0, 4).join(''),
                                     }
                                 ];
-                                console.log(self.response);
 
-                                if (!self.doOnce) {
-                                    self.doOnce = true;
-                                    self.no = parseInt(self.response[0].no);
-                                }
-                                self.error = self.response[0].state != '0000'; // (self.no != self.response[0].no);
+                                if (self.response[0].no === oldNo) self.errorMessage.push('通信エラー');
+                                if (self.response[0].state !== '0000') self.errorMessage.push('コントローラ異常');
+
                             }
                         )
                         .catch(e => {
                             console.error(e);
+                            self.errorMessage.push('通信エラー');
                         })
 
-                    this.methodId = setTimeout(this.GetFile, this.interval * 1000)
+                    this.methodId = setTimeout(this.GetFile, this.interval * 1000);
                 },
 
+                // 更新間隔を変更
                 ResetInterval(interval) {
                     this.interval = interval;
 
@@ -113,6 +111,7 @@
                     this.GetFile();
                 },
 
+                // 取得データの変換
                 ConvertAscii2String(value, length = null) {
                     if (value == null) return 'Non';
                     if (length === null) length = value.length;
@@ -133,6 +132,7 @@
             },
 
             beforeDestroy() {
+                // タイマー処理を解放する
                 clearTimeout(this.GetFile);
             },
         });
