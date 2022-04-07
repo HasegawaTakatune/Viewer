@@ -13,6 +13,8 @@
     <div id="app">
         <div>
             <span>間隔</span>
+            <input type="radio" name="interval" id="interval-2" value=2 @click="ResetInterval(2)" checked />
+            <label for="interval-10">2秒</label>
             <input type="radio" name="interval" id="interval-10" value=10 @click="ResetInterval(10)" checked />
             <label for="interval-10">10秒</label>
             <input type="radio" name="interval" id="interval-30" value=30 @click="ResetInterval(30)" />
@@ -32,8 +34,9 @@
             </thead>
             <tbody>
                 <tr v-for="(rows, index) in response" :key="index">
-                    <td>{{rows.no}}</td>
-                    <td>{{rows.data}}</td>
+                    <td>{{ rows.no }}</td>
+                    <td>{{ rows.data }}</td>
+                    <td>{{ rows.data - beforeData }}</td>
                 </tr>
             </tbody>
         </table>
@@ -49,9 +52,11 @@
             name: 'Viewer',
 
             data: {
-                headers: ['No.', 'データ'],
+                headers: ['No.', '累積流量', '流量'],
                 interval: 10,
                 response: [],
+
+                beforeData: 0,
 
                 methodId: null,
                 errorMessage: [],
@@ -75,6 +80,7 @@
                     })
                         .then(
                             res => {
+                                this.beforeData = this.response.data;
 
                                 const list = res.data.split(/\n/);
                                 const dd = list[0].split('');
