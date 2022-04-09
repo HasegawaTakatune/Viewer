@@ -76,38 +76,15 @@
                 // データ取得
                 GetFile() {
 
-                    // const SOH = '1';
-
-                    // let self = this;
-                    // let oldNo = this.response[0]?.no;
-
-                    // this.errorMessage = [];
 
                     axios.get('http://k2hjnay9448g.shop/sensor_testpage/data.bin', {
                         withCredentials: true,
                     })
                         .then(
                             res => {
-                                // this.beforeData = this.response.data;
 
                                 const list = res.data.split(/\n/);
-                                // const dd = list[0].split('');
-                                this.SetDetectionData(list[0].split(''))
-
-                                // // 取得データの変換・格納
-                                // self.response = [
-                                //     {
-                                //         no: dd.splice(0, 4).join(''),
-                                //         day: self.ConvertAscii2String(dd, 6),
-                                //         time: self.ConvertAscii2String(dd, 6),
-                                //         data: `${self.ConvertAscii2String(dd, 10)} ml`,
-                                //         state: dd.splice(0, 4).join(''),
-                                //     }
-                                // ];
-
-                                // if (self.response[0].no === oldNo) self.errorMessage.push('通信エラー');
-                                // if (self.response[0].state !== '0000') self.errorMessage.push('コントローラ異常');
-
+                                this.SetDetectionData(list[0].split(''));
                             }
                         )
                         .catch(e => {
@@ -134,7 +111,7 @@
 
                     let oldNo = this.response[0]?.no;
 
-                    const param = parseInt(this.response.data, 10);
+                    const param = parseInt(this.response[0]?.data, 10);
                     this.beforeData = !isNaN(param) ? param : 0;
 
                     // 取得データの変換・格納
