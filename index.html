@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 
 <head>
     <meta charset="UTF-8">
@@ -36,7 +36,7 @@
                 <tr v-for="(rows, index) in response" :key="`second-${index}`">
                     <td>{{ rows.no }}</td>
                     <td>{{ rows.data }} ml</td>
-                    <td>{{ rows.data - beforeData }} ml</td>
+                    <td>{{ state === DOING ? (rows.data - beforeData) : 0 }} ml</td>
                 </tr>
             </tbody>
         </table>
@@ -44,7 +44,6 @@
         <div v-for="(msg, index) in errorMessage" :key="index" class="alert-text">{{msg}}</div>
     </div>
     <script>
-
         var app = new Vue({
 
             el: '#app',
@@ -52,6 +51,12 @@
             name: 'Viewer',
 
             data: {
+                STOP: 0,
+                START: 1,
+                DOING: 2,
+
+                state: 0,
+
                 headers: ['No.', '累積流量', '流量'],
                 interval: 10,
                 response: [
@@ -68,15 +73,12 @@
 
                 methodId: null,
                 errorMessage: [],
-
             },
 
             methods: {
 
                 // データ取得
                 GetFile() {
-
-
                     axios.get('http://k2hjnay9448g.shop/sensor_testpage/data.bin', {
                         withCredentials: true,
                     })
@@ -91,8 +93,10 @@
                             console.log(e);
                             self.errorMessage.push('通信エラー');
                         })
+
+                    // テスト用
                     // const list = '00013231303932333138303833353132330000'.split(/\n/);
-                    // this.SetDetectionData(list[0].split(''))
+                    // this.SetDetectionData(list[0].split(''));
 
                     this.methodId = setTimeout(this.GetFile, this.interval * 1000);
                 },
@@ -125,8 +129,21 @@
                         }
                     ];
 
+                    // 取得データからエラーチェックする
                     if (this.response[0].no === oldNo) this.errorMessage.push('通信エラー');
                     if (this.response[0].state !== '0000') this.errorMessage.push('コントローラ異常');
+
+                    this.UpdatedState();
+                },
+
+                // ステータスの更新
+                UpdatedState() {
+                    switch (this.state) {
+                        case this.STOP: this.state = this.START; break;
+                        case this.START: this.state = this.DOING; break;
+                        case this.DOING: break;
+                        default: this.state = this.STOP; break;
+                    }
                 },
 
                 // 取得データの変換
